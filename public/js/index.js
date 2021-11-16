@@ -9,6 +9,8 @@ class Recommender {
         reader.onload = () => {
             recommender.set_utility_matrix(reader.result)
         }
+
+        this.sim = this.pearson
     }
 
     set_utility_matrix(matrix) {
@@ -26,6 +28,14 @@ class Recommender {
         content += "\n"
 
         console.log(content)
+    }
+
+    pearson(u, v) {
+        const utility_matrix = this.utility_matrix
+        
+        let i = 0;
+        
+        rui = utility_matrix[u][i]
     }
 }
 
