@@ -2,76 +2,86 @@
 <html lang="es">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-    <title>Sistema recomendador</title>
+  <title>Sistema recomendador</title>
 </head>
 
 <body>
 
-    <div class="container mt-3">
-        <!-- Title -->
-        <div class="row">
-            <div class="col text-center">
-                <h1>Sistema Recomendador</h1>
-            </div>
-        </div>
-        <!-- Matrix input -->
-        <div class="row">
-            <div class="mb-3">
-                <label for="utility_matrix_input" class="form-label">Matriz de utilidad</label>
-                <input class="form-control" type="file" id="utility_matrix_input">
-            </div>
-        </div>
-        <!-- Metric type -->
-        <div class="row">
-            <div class="col">
-                <div class="mb-3">
-                    <label for="metrics_dropdown" class="form-label">Métrica</label>
-                    <select class="form-select" aria-label="Métrica a utilizar" id="metrics_dropdown">
-                        <option value="1">Correlación de Pearson</option>
-                        <option value="2">Distancia coseno</option>
-                        <option value="3">Distancia euclídea</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <!-- Neighbors number -->
-        <div class="row">
-            <div class="mb-3">
-                <label for="neighbors_number_input" class="form-label">Número de vecinos considerados</label>
-                <input class="form-control" type="number" id="neighbors_number_input" min="1">
-            </div>
-            <dv class="col">
-            </dv>
-        </div>
-        <!-- Prediction type -->
-        <div class="row">
-            <div class="col">
-                <div class="mb-3">
-                    <label for="prediction_type" class="form-label">Tipo de predicción</label>
-                    <select class="form-select" aria-label="Tipo de predicción" id="prediction_type">
-                        <option value="1">Simple</option>
-                        <option value="2">Diferencia con la media</option>
-                    </select>                
-                </div>
-            </div>
-        </div>
-        <!-- Calculate button -->
-        <div class="row">
-            <div class="col text-center">
-                <div class="mb-3">
-                    <button class="btn btn-primary w-50" id="calculate_btn">Calcular</button>                
-                </div>
-            </div>
-        </div>
+  <div class="container mt-3">
+    <!-- Title -->
+    <div class="row">
+      <div class="col text-center">
+        <h1>Sistema Recomendador</h1>
+      </div>
     </div>
+    <form id="calc_form">
+      <!-- Matrix input -->
+      <div class="row">
+        <div class="mb-3">
+          <label for="utility_matrix_input" class="form-label">Matriz de utilidad</label>
+          <input class="form-control" type="file" id="utility_matrix_input">
+        </div>
+      </div>
+      <!-- Metric type -->
+      <div class="row">
+        <div class="col">
+          <div class="mb-3">
+            <label for="metrics_dropdown" class="form-label">Métrica</label>
+            <select class="form-select" aria-label="Métrica a utilizar" id="metrics_dropdown">
+              <option value="pearson">Correlación de Pearson</option>
+              <option value="cosine">Distancia coseno</option>
+              <option value="euclidean">Distancia euclídea</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Neighbors number -->
+      <div class="row">
+        <div class="mb-3">
+          <label for="neighbors_number_input" class="form-label">Número de vecinos considerados</label>
+          <input class="form-control" type="number" id="neighbors_number_input" min="3" value="3">
+        </div>
+      </div>
+      <!-- Prediction method -->
+      <div class="row">
+        <div class="col">
+          <div class="mb-3">
+            <label for="prediction_method" class="form-label">Método de predicción</label>
+            <select class="form-select" aria-label="Método de predicción" id="prediction_method">
+              <option value="userBased/collaborativeFiltering/meanDiff">Diferencia con la media</option>
+              <option value="userBased/collaborativeFiltering/simple">Simple</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Calculate button -->
+      <div class="row">
+        <div class="col text-center">
+          <div class="mb-3">
+            <button class="btn btn-primary w-50" id="calculate_btn" type="submit">Calcular</button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="row m-3">
+      <div class="col-sm-6 text-center"><span class="h3" hidden id="matrix-one-title">Matriz de utilidad original</span></div>
+      <div class="col-sm-6 text-center"><span class="h3" hidden id="matrix-two-title">Matriz de utilidad con predicciones</span></div>
+    </div>
+    <div class="row">
+      <div class="col me-3 text-center" id="matrix_container">
+      </div>
+      <div class="col me-3 text-center" id="new_matrix_container">
+      </div>
+    </div>
+  </div>
 
 
 
@@ -86,12 +96,12 @@
 
 
 
-    <script src="./js/index.js"></script>
+  <script type="module" src="./js/index.js"></script>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>
