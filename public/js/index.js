@@ -32,14 +32,14 @@ class Recommender {
   }
 
   pearson(u, v) {
-    
+
     // SUM [(r(u, i) - mean(u)) * (r(v, i) - mean(v))]
     let A = 0;
 
     // Cx = SUM[(r(x, i) - mean(x))^2]
-    let Cu = 0;
-    let Cv = 0;
-    
+    let Bu = 0;
+    let Bv = 0;
+
     const u_mean = this.getUserMean(u);
     const v_mean = this.getUserMean(v);
 
@@ -50,6 +50,7 @@ class Recommender {
       // r(v, i)
       const r_v = this.utility_matrix[v][i];
 
+      // Work only on Suv set
       if (r_u === undefined || r_v === undefined) continue;
 
       const u_diff = r_u - u_mean;
@@ -57,11 +58,38 @@ class Recommender {
 
       A += u_diff * v_diff;
 
-      Cu += u_diff ** 2;
-      Cv += v_diff ** 2; 
+      Bu += u_diff ** 2;
+      Bv += v_diff ** 2;
     }
 
-    return A / Math.sqrt(Cu * Cv);
+
+    return A / Math.sqrt(Bu * Bv);
+  }
+
+  cosine(u, v) {
+
+    // SUM[r(u, i) * r(v, i)]
+    let A = 0;
+
+    // Bx = SUM[r(x, i) ^ 2]
+    let Bu = 0;
+    let Bv = 0;
+
+    for (let i = 0; i < this.utility_matrix[0].length; i++) {
+      // r(u, i)
+      const r_u = this.utility_matrix[u][i];
+      // r(v, i)
+      const r_v = this.utility_matrix[v][i];
+
+      // Work only on Suv set
+      if (r_u === undefined || r_v === undefined) continue;
+      
+      A += r_u * r_v;
+      Bu += r_u ** 2;
+      Bv += r_v ** 2;
+    }
+
+    return A / Math.sqrt(Bu * Bv);
   }
 
   getUserMean(user_index) {
@@ -76,7 +104,7 @@ class Recommender {
       num_of_califications++;
       return sum + calif;
     }, 0);
-    
+
     return califications_sum / num_of_califications;
   }
 }
