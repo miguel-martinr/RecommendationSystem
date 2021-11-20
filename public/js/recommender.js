@@ -36,8 +36,13 @@ export class Recommender {
       .map((str_row) => str_row.split(" "))
       .map((row) => row.map((char) => char == not_value ? undefined : parseInt(char))
         .filter((calif) => calif === undefined || !isNaN(calif)));
+    this.setSimilarityMatrix();
   }
 
+  setSimilarityMatrix(matrix) {
+    if (!matrix) this.similarityMatrix = this.calculateSimilarityMatrix();
+    else this.similarityMatrix = matrix;
+  }
 
   get emptyItems() {
     const positions = [];
@@ -130,6 +135,17 @@ export class Recommender {
     }
   }
 
+  calculateSimilarityMatrix() {
+    const similarityMatrix = [];
+    for(let u = 0; u < this.utility_matrix.length; u++) {
+      similarityMatrix.push([]);
+      for (let v = 0; v < this.utility_matrix.length; v++) {
+        similarityMatrix[u].push(this.sim(u, v));
+      }
+    }
+
+    return similarityMatrix;
+  }
 
   // Returns user_index mean of califications
   getUserMean(user_index) {
@@ -149,15 +165,16 @@ export class Recommender {
   }
 
   // Gets k nearest neighbors to user_index user (according to sim function)
-  getNearestNeighbors(u_user, neighborsNum) {
-    const user_califications = this.utility_matrix[u_user];
+  getNearestNeighbors(u, neighborsNum) {
+    const user_califications = this.utility_matrix[u];
 
-    if (!user_califications) throw new Error(`There's not any user at index ${u_user}`);
+    if (!user_califications) throw new Error(`There's not any user at index ${u}`);
 
-    const users_similarity = this.utility_matrix.map((_, v_user) => ({ index: v_user, sim: this.sim(u_user, v_user) }));
+    const similarityMatrix = this.similarityMatrix;
+    const users_similarity = similarityMatrix[u].map((sim, index) => ({ index, sim }));
 
     return users_similarity.sort((a, b) => this.similaritySorter(a.sim, b.sim))
-      .slice(1, neighborsNum + 1); // Ignores similarity with u_user itself (1)
+      .slice(1, neighborsNum + 1); // Ignores similarity with u itself (1)
   }
 
 
@@ -213,18 +230,21 @@ export class Recommender {
       case metrics.pearson:
         this.sim = this.similarityCalculators.pearson;
         this.similaritySorter = sorters.decrescent;
-        return;
+        break;
       case metrics.cosine:
         this.sim = this.similarityCalculators.cosine;
         this.similaritySorter = sorters.decrescent;
-        return;
+        break;
       case metrics.euclidean:
         this.sim = this.similarityCalculators.euclidean;
         this.similaritySorter = sorters.increscent;
-
+        break;
       default:
         throw new Error(`Unknown metric method: ${metricName}`);
     }
+
+    if (this.utility_matrix) this.setSimilarityMatrix();
+    return;
   }
 
   setPredictor(predictorName) {
