@@ -33,6 +33,35 @@ class Recommender {
 
   pearson(u, v) {
     
+    // SUM [(r(u, i) - mean(u)) * (r(v, i) - mean(v))]
+    let A = 0;
+
+    // Cx = SUM[(r(x, i) - mean(x))^2]
+    let Cu = 0;
+    let Cv = 0;
+    
+    const u_mean = this.getUserMean(u);
+    const v_mean = this.getUserMean(v);
+
+    for (let i = 0; i < this.utility_matrix[0].length; i++) {
+
+      // r(u, i)
+      const r_u = this.utility_matrix[u][i];
+      // r(v, i)
+      const r_v = this.utility_matrix[v][i];
+
+      if (r_u === undefined || r_v === undefined) continue;
+
+      const u_diff = r_u - u_mean;
+      const v_diff = r_v - v_mean;
+
+      A += u_diff * v_diff;
+
+      Cu += u_diff ** 2;
+      Cv += v_diff ** 2; 
+    }
+
+    return A / Math.sqrt(Cu * Cv);
   }
 
   getUserMean(user_index) {
