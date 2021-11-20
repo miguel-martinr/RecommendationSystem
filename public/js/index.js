@@ -83,13 +83,30 @@ class Recommender {
 
       // Work only on Suv set
       if (r_u === undefined || r_v === undefined) continue;
-      
+
       A += r_u * r_v;
       Bu += r_u ** 2;
       Bv += r_v ** 2;
     }
 
     return A / Math.sqrt(Bu * Bv);
+  }
+
+  euclidean(u, v) {
+    let A = 0;
+    for (let i = 0; i < this.utility_matrix[0].length; i++) {
+      // r(u, i)
+      const r_u = this.utility_matrix[u][i];
+      // r(v, i)
+      const r_v = this.utility_matrix[v][i];
+
+      // Work only on Suv set
+      if (r_u === undefined || r_v === undefined) continue;
+
+      A += (r_u - r_v) ** 2
+    }
+
+    return Math.sqrt(A);
   }
 
   getUserMean(user_index) {
