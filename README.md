@@ -1,2 +1,2 @@
 # RecommendationSystem
-Sistema recomendador que implementa el método de filtrado colaborativo.
+Sistema recomendador que implementa filtrado colaborativo basado en usuario.
