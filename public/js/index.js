@@ -14,13 +14,7 @@ reader.onload = () => {
   
   // Show new original matrix
   recommender.setUtilityMatrix(reader.result);
-  let opts = {
-    markedCells: recommender.emptyItems,
-    styleClasses: ["text-white", "bg-danger"],
-    rowHeaders: "User",
-    colHeaders: "Item"
-  };
-  showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utility_matrix))
+  showOriginalMatrix();
 
   // Show similarity matrix
   showSimilarityMatrix();
@@ -40,9 +34,6 @@ const readMatrix = (input_event) => {
 const file_input = document.getElementById('utility_matrix_input');
 file_input.addEventListener('input', readMatrix);
 
-
-
-
 // Change similarity metric
 document.getElementById('metrics_dropdown').addEventListener('change', (ev) => {
   recommender.setMetric(ev.target.value);
@@ -57,24 +48,8 @@ document.getElementById('prediction_method').addEventListener('change', (ev) => 
 // Calculate new matrix
 document.getElementById('calc_form').addEventListener('submit', (ev) => {
   ev.preventDefault();
-  const numOfNeighbors = parseInt(document.getElementById('neighbors_number_input').value);
-  recommender.numOfNeighbors = numOfNeighbors;
 
-  const newMatrix = recommender.calculate();
-  const formattedMatrix = Recommender.formatMatrix(newMatrix);
-
-  // Removes previos calculated matrix
-  removeMatrix('new_matrix_container', 'matrix-one-title');
-
-  const opts = {
-    markedCells: recommender.emptyItems,
-    styleClasses: ["text-white", "bg-success"],
-    rowHeaders: "User",
-    colHeaders: "Item"
-  };
-
-  // Shows new calculated matrix
-  showMatrix('new_matrix_container', 'matrix-two-title', opts, formattedMatrix);
+  showCalculatedMatrix();
 
   // Shows new similarity Matrix
   showSimilarityMatrix();
@@ -93,6 +68,36 @@ const showSimilarityMatrix = () => {
   showMatrix('similarity_matrix_container', 'matrix-three-title', opts, formattedSimilarityMatrix)
 }
 
+const showCalculatedMatrix = () => {
+  const numOfNeighbors = parseInt(document.getElementById('neighbors_number_input').value);
+  recommender.numOfNeighbors = numOfNeighbors;
+  
+  const newMatrix = recommender.calculate();
+  const formattedMatrix = Recommender.formatMatrix(newMatrix);
+  
+  // Removes previos calculated matrix
+  removeMatrix('new_matrix_container', 'matrix-one-title');
+  
+  const opts = {
+    markedCells: recommender.emptyItems,
+    styleClasses: ["text-white", "bg-success"],
+    rowHeaders: "User",
+    colHeaders: "Item"
+  };
+  
+  // Shows new calculated matrix
+  showMatrix('new_matrix_container', 'matrix-two-title', opts, formattedMatrix);
+}
+
+const showOriginalMatrix = () => {
+  let opts = {
+    markedCells: recommender.emptyItems,
+    styleClasses: ["text-white", "bg-danger"],
+    rowHeaders: "User",
+    colHeaders: "Item"
+  };
+  showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utility_matrix));
+}
 
 const showMatrix = (matrixContainerId, titleId, opts, matrix) => {
   const matrixContainer = document.getElementById(matrixContainerId);
@@ -107,8 +112,6 @@ const removeMatrix = (matrixContainerId, titleId) => {
   const matrixContainer = document.getElementById(matrixContainerId);
   matrixContainer.innerHTML = "";
 }
-
-
 
 
 
