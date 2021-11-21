@@ -9,14 +9,14 @@ export const createTable = (matrix, opts) => {
 
   thead.innerHTML = '<th scope="col">#</th>';
 
-  let getRowHeader = undefined;
-  if (Array.isArray(rowHeaders)) {
-    getRowHeader = (i) => rowHeaders[i];
-  } else {
-    getRowHeader = (i) => rowHeaders  + `${i+1}`;
-  }
 
-  matrix[0].forEach((_, i) => thead.innerHTML += `<th scope="col">${getRowHeader(i)}</th>`);
+  let getColHeader = undefined;
+  if (Array.isArray(colHeaders)) {
+    getColHeader = (i) => colHeaders[i];
+  } else {
+    getColHeader = (i) => colHeaders  + `${i+1}`;
+  }
+  matrix[0].forEach((_, i) => thead.innerHTML += `<th scope="col">${getColHeader(i)}</th>`);
   table.appendChild(createTr(thead.innerHTML));
 
 
@@ -31,22 +31,35 @@ export const createTable = (matrix, opts) => {
     });
   });
 
+
+
   if (Array.isArray(markedCells)) {
     markedCells.forEach(([i, j]) => {
       body[i][j].classList.add(...styleClasses);
     });
   } else {
-    body.forEach(row => row.forEach(item => item.classList.add(...styleClasses)));
+    switch (markedCells) {
+      case "all":
+        body.forEach(row => row.forEach(item => item.classList.add(...styleClasses)));
+        break;
+      case "diagonal":
+        body.forEach((row, i) => row.forEach((item, j) => {
+          if (i === j) item.classList.add(...styleClasses);
+        }));
+    }
   }
 
-  let getColHeader = undefined;
-  if (Array.isArray(colHeaders)) {
-    getColHeader = (i) => colHeaders[i];
+
+  
+
+  let getRowHeader = undefined;
+  if (Array.isArray(rowHeaders)) {
+    getRowHeader = (i) => rowHeaders[i];
   } else {
-    getColHeader = (i) => colHeaders  + `${i+1}`;
+    getRowHeader = (i) => rowHeaders  + `${i+1}`;
   }
   body.forEach((row, i) => {
-    const rowHeader = `<th scope="row">${getColHeader(i)}</th>`;
+    const rowHeader = `<th scope="row">${getRowHeader(i)}</th>`;
     const tr = document.createElement('tr');
     tr.innerHTML = rowHeader;
     row.forEach((_, j) => {

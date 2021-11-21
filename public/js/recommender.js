@@ -33,9 +33,9 @@ export class Recommender {
     const not_value = "-";;
     this.utility_matrix = matrix
       .split("\n")
-      .map((str_row) => str_row.split(" "))
-      .map((row) => row.map((char) => char == not_value ? undefined : parseInt(char))
-        .filter((calif) => calif === undefined || !isNaN(calif)));
+      .map((str_row) => str_row.trim().split(" "))
+      .map((row) => row.map((char) => char == not_value ? undefined : parseFloat(char)))
+        
     this.setSimilarityMatrix();
   }
 

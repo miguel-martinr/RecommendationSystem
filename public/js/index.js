@@ -2,14 +2,12 @@ import { Recommender } from "./recommender.js";
 import { createTable, createTr } from "./utilty.js";
 
 const recommender = new Recommender();
-
+window.recommender = recommender;
 
 // Read matrix
 let reader = new FileReader()
 
 reader.onload = () => {
-  // Remove previous calculated matrix
-  removeMatrix('new_matrix_container', 'matrix-two-title');
   
   // Show new original matrix
   recommender.setUtilityMatrix(reader.result);
@@ -63,7 +61,7 @@ const showSimilarityMatrix = () => {
   const formattedSimilarityMatrix = Recommender.formatMatrix(recommender.similarityMatrix);
   
   const opts = {
-    markedCells: "all",
+    markedCells: "diagonal",
     styleClasses: ["text-white", "bg-dark"],
     rowHeaders: "User",
     colHeaders: "User"
@@ -79,7 +77,7 @@ const showCalculatedMatrix = () => {
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
   
   // Removes previos calculated matrix
-  removeMatrix('new_matrix_container', 'matrix-one-title');
+  removeMatrix('new_matrix_container', 'matrix-two-title');
   
   const opts = {
     markedCells: recommender.emptyItems,
@@ -102,12 +100,17 @@ const showOriginalMatrix = () => {
   showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utility_matrix));
 }
 
+
+
+
+
+
 const showMatrix = (matrixContainerId, titleId, opts, matrix) => {
   const matrixContainer = document.getElementById(matrixContainerId);
   matrixContainer.innerHTML = "";
 
   document.getElementById(titleId).hidden = false;
-  matrixContainer.appendChild(createTable(matrix, opts));
+  matrixContainer.appendChild(createTable(matrix, opts));  
 }
 
 const removeMatrix = (matrixContainerId, titleId) => {
