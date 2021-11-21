@@ -4,7 +4,6 @@ import { createTable, createTr } from "./utilty.js";
 const recommender = new Recommender();
 
 
-
 // Read matrix
 let reader = new FileReader()
 
@@ -48,6 +47,10 @@ document.getElementById('prediction_method').addEventListener('change', (ev) => 
 // Calculate new matrix
 document.getElementById('calc_form').addEventListener('submit', (ev) => {
   ev.preventDefault();
+
+  if (!recommender.utility_matrix) {
+    return alert("Debes subir 1 matriz de utilidad.");
+  }
 
   showCalculatedMatrix();
 
