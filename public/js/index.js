@@ -1,4 +1,5 @@
 import { Recommender } from "./recommender.js";
+import { createTable, createTr } from "./utilty.js";
 
 const recommender = new Recommender();
 
@@ -8,26 +9,34 @@ const recommender = new Recommender();
 let reader = new FileReader()
 
 reader.onload = () => {
-  recommender.setUtilityMatrix(reader.result);
-
-  const formattedMatrix = Recommender.formatMatrix(recommender.utility_matrix);
-  
-  const matrixContainer = document.getElementById('matrix_container');
-  matrixContainer.innerHTML = "";
-
-  
   // Remove previous calculated matrix
   document.getElementById('matrix-two-title').hidden = true;
   const newMatrixContainer = document.getElementById('new_matrix_container');
   newMatrixContainer.innerHTML = "";
-  
+
+
+
   // Show new original matrix
-  const opts = { 
-    markedCells: recommender.emptyItems, 
-    styleClasses: ["text-white", "bg-danger"] 
+  recommender.setUtilityMatrix(reader.result);
+  const formattedOriginalMatrix = Recommender.formatMatrix(recommender.utility_matrix);
+  const originalMatrixContainer = document.getElementById('matrix_container');
+  originalMatrixContainer.innerHTML = "";
+
+  let opts = {
+    markedCells: recommender.emptyItems,
+    styleClasses: ["text-white", "bg-danger"],
+    rowHeaders: "User",
+    colHeaders: "Item"
   };
+
   document.getElementById('matrix-one-title').hidden = false;
-  matrixContainer.appendChild(createTable(formattedMatrix, opts));
+  originalMatrixContainer.appendChild(createTable(formattedOriginalMatrix, opts));
+
+
+
+
+  // Show similarity matrix
+  showSimilarityMatrix();
 }
 
 const readMatrix = (input_event) => {
@@ -70,66 +79,39 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   const newMatrixContainer = document.getElementById('new_matrix_container');
   newMatrixContainer.innerHTML = "";
 
-  const opts = { 
-    markedCells: recommender.emptyItems, 
-    styleClasses: ["text-white", "bg-success"] 
+  const opts = {
+    markedCells: recommender.emptyItems,
+    styleClasses: ["text-white", "bg-success"],
+    rowHeaders: "User",
+    colHeaders: "Item"
   };
 
   document.getElementById('matrix-two-title').hidden = false;
   newMatrixContainer.appendChild(createTable(formattedMatrix, opts));
+
+
+  // Show similarity Matrix
+  showSimilarityMatrix();
 });
 
 
+const showSimilarityMatrix = () => {
+  document.getElementById('matrix-three-title').hidden = false;
+  const formattedSimilarityMatrix = Recommender.formatMatrix(recommender.similarityMatrix);
+  const similarityMatrixContainer = document.getElementById('similarity_matrix_container');
+  similarityMatrixContainer.innerHTML = "";
 
+  const opts = {
+    markedCells: "all",
+    styleClasses: ["text-white", "bg-dark"],
+    rowHeaders: "User",
+    colHeaders: "User"
+  };
 
-const createTable = (matrix, opts) => {
-
-  const { markedCells, styleClasses } = opts;
-
-  const table = document.createElement('table');
-  table.classList.add('table');
-  const thead = document.createElement('thead');
-
-  thead.innerHTML = '<th scope="col">#</th>';
-
-  matrix[0].forEach((_, i) => thead.innerHTML += `<th scope="col">Item ${i + 1}</th>`);
-  table.appendChild(createTr(thead.innerHTML));
-
-
-
-  const tbody = document.createElement('tbody');
-
-  const body = matrix.map((row, i) => {
-    return row.map((item, j) => {
-      const td = document.createElement('td');
-      td.innerHTML = item;
-      return td;
-    });
-  });
-
-  markedCells.forEach(([i, j]) => {
-    body[i][j].classList.add(...styleClasses);
-  });
-
-  body.forEach((row, i) => {
-    const rowHeader = `<th scope="row">User ${i + 1}</th>`;
-    const tr = document.createElement('tr');
-    tr.innerHTML = rowHeader;
-    row.forEach((_, j) => {
-      tr.appendChild(body[i][j]);
-      tbody.appendChild(tr);
-    });
-  });
-
-  table.appendChild(tbody);
-  return table;
+  similarityMatrixContainer.appendChild(createTable(formattedSimilarityMatrix, opts));
 }
 
-const createTr = (innerHTML) => {
-  const tr = document.createElement('tr');
-  tr.innerHTML = innerHTML;
-  return tr;
-}
+
 
 
 
