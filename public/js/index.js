@@ -10,30 +10,17 @@ let reader = new FileReader()
 
 reader.onload = () => {
   // Remove previous calculated matrix
-  document.getElementById('matrix-two-title').hidden = true;
-  const newMatrixContainer = document.getElementById('new_matrix_container');
-  newMatrixContainer.innerHTML = "";
-
-
-
+  removeMatrix('new_matrix_container', 'matrix-two-title');
+  
   // Show new original matrix
   recommender.setUtilityMatrix(reader.result);
-  const formattedOriginalMatrix = Recommender.formatMatrix(recommender.utility_matrix);
-  const originalMatrixContainer = document.getElementById('matrix_container');
-  originalMatrixContainer.innerHTML = "";
-
   let opts = {
     markedCells: recommender.emptyItems,
     styleClasses: ["text-white", "bg-danger"],
     rowHeaders: "User",
     colHeaders: "Item"
   };
-
-  document.getElementById('matrix-one-title').hidden = false;
-  originalMatrixContainer.appendChild(createTable(formattedOriginalMatrix, opts));
-
-
-
+  showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utility_matrix))
 
   // Show similarity matrix
   showSimilarityMatrix();
@@ -76,8 +63,8 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   const newMatrix = recommender.calculate();
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
 
-  const newMatrixContainer = document.getElementById('new_matrix_container');
-  newMatrixContainer.innerHTML = "";
+  // Removes previos calculated matrix
+  removeMatrix('new_matrix_container', 'matrix-one-title');
 
   const opts = {
     markedCells: recommender.emptyItems,
@@ -86,29 +73,39 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
     colHeaders: "Item"
   };
 
-  document.getElementById('matrix-two-title').hidden = false;
-  newMatrixContainer.appendChild(createTable(formattedMatrix, opts));
+  // Shows new calculated matrix
+  showMatrix('new_matrix_container', 'matrix-two-title', opts, formattedMatrix);
 
-
-  // Show similarity Matrix
+  // Shows new similarity Matrix
   showSimilarityMatrix();
 });
 
 
 const showSimilarityMatrix = () => {
-  document.getElementById('matrix-three-title').hidden = false;
   const formattedSimilarityMatrix = Recommender.formatMatrix(recommender.similarityMatrix);
-  const similarityMatrixContainer = document.getElementById('similarity_matrix_container');
-  similarityMatrixContainer.innerHTML = "";
-
+  
   const opts = {
     markedCells: "all",
     styleClasses: ["text-white", "bg-dark"],
     rowHeaders: "User",
     colHeaders: "User"
   };
+  showMatrix('similarity_matrix_container', 'matrix-three-title', opts, formattedSimilarityMatrix)
+}
 
-  similarityMatrixContainer.appendChild(createTable(formattedSimilarityMatrix, opts));
+
+const showMatrix = (matrixContainerId, titleId, opts, matrix) => {
+  const matrixContainer = document.getElementById(matrixContainerId);
+  matrixContainer.innerHTML = "";
+
+  document.getElementById(titleId).hidden = false;
+  matrixContainer.appendChild(createTable(matrix, opts));
+}
+
+const removeMatrix = (matrixContainerId, titleId) => {
+  document.getElementById(titleId).hidden = true;
+  const matrixContainer = document.getElementById(matrixContainerId);
+  matrixContainer.innerHTML = "";
 }
 
 
