@@ -28,7 +28,7 @@ const readMatrix = (input_event) => {
   reader.readAsText(file);
 }
 
-const file_input = document.getElementById('utility_matrix_input');
+const file_input = document.getElementById('utilityMatrix_input');
 file_input.addEventListener('input', readMatrix);
 
 // Change similarity metric
@@ -46,7 +46,7 @@ document.getElementById('prediction_method').addEventListener('change', (ev) => 
 document.getElementById('calc_form').addEventListener('submit', (ev) => {
   ev.preventDefault();
 
-  if (!recommender.utility_matrix) {
+  if (!recommender.utilityMatrix) {
     return alert("Debes subir 1 matriz de utilidad.");
   }
 
@@ -97,7 +97,7 @@ const showOriginalMatrix = () => {
     rowHeaders: "User",
     colHeaders: "Item"
   };
-  showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utility_matrix));
+  showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utilityMatrix));
 }
 
 

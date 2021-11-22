@@ -22,7 +22,6 @@ const metrics = {
 
 export class Recommender {
   constructor() {
-    this.sim = this.pearson;
     this.numOfNeighbors = 3;
 
     this.setMetric(metrics.pearson);
@@ -31,7 +30,7 @@ export class Recommender {
 
   setUtilityMatrix(matrix) {
     const not_value = "-";;
-    this.utility_matrix = matrix
+    this.utilityMatrix = matrix
       .split("\n")
       .map((str_row) => str_row.trim().split(" "))
       .map((row) => row.map((char) => char == not_value ? undefined : parseFloat(char)))
@@ -46,7 +45,7 @@ export class Recommender {
 
   get emptyItems() {
     const positions = [];
-    this.utility_matrix.forEach((row, i) => {
+    this.utilityMatrix.forEach((row, i) => {
       row.forEach((item, j) => {
         if (item === undefined) positions.push([i, j]);
       });
@@ -65,26 +64,26 @@ export class Recommender {
       let Bu = 0;
       let Bv = 0;
 
-      const u_mean = this.getUserMean(u);
-      const v_mean = this.getUserMean(v);
+      const uMean = this.getUserMean(u);
+      const vMean = this.getUserMean(v);
 
-      for (let i = 0; i < this.utility_matrix[0].length; i++) {
+      for (let i = 0; i < this.utilityMatrix[0].length; i++) {
 
         // r(u, i)
-        const r_u = this.utility_matrix[u][i];
+        const rU = this.utilityMatrix[u][i];
         // r(v, i)
-        const r_v = this.utility_matrix[v][i];
+        const rV = this.utilityMatrix[v][i];
 
         // Work only on Suv set
-        if (r_u === undefined || r_v === undefined) continue;
+        if (rU === undefined || rV === undefined) continue;
 
-        const u_diff = r_u - u_mean;
-        const v_diff = r_v - v_mean;
+        const uDiff = rU - uMean;
+        const vDiff = rV - vMean;
 
-        A += u_diff * v_diff;
+        A += uDiff * vDiff;
 
-        Bu += u_diff ** 2;
-        Bv += v_diff ** 2;
+        Bu += uDiff ** 2;
+        Bv += vDiff ** 2;
       }
 
 
@@ -100,18 +99,18 @@ export class Recommender {
       let Bu = 0;
       let Bv = 0;
 
-      for (let i = 0; i < this.utility_matrix[0].length; i++) {
+      for (let i = 0; i < this.utilityMatrix[0].length; i++) {
         // r(u, i)
-        const r_u = this.utility_matrix[u][i];
+        const rU = this.utilityMatrix[u][i];
         // r(v, i)
-        const r_v = this.utility_matrix[v][i];
+        const rV = this.utilityMatrix[v][i];
 
         // Work only on Suv set
-        if (r_u === undefined || r_v === undefined) continue;
+        if (rU === undefined || rV === undefined) continue;
 
-        A += r_u * r_v;
-        Bu += r_u ** 2;
-        Bv += r_v ** 2;
+        A += rU * rV;
+        Bu += rU ** 2;
+        Bv += rV ** 2;
       }
 
       return A / Math.sqrt(Bu * Bv);
@@ -119,16 +118,16 @@ export class Recommender {
 
     euclidean(u, v) {
       let A = 0;
-      for (let i = 0; i < this.utility_matrix[0].length; i++) {
+      for (let i = 0; i < this.utilityMatrix[0].length; i++) {
         // r(u, i)
-        const r_u = this.utility_matrix[u][i];
+        const rU = this.utilityMatrix[u][i];
         // r(v, i)
-        const r_v = this.utility_matrix[v][i];
+        const rV = this.utilityMatrix[v][i];
 
         // Work only on Suv set
-        if (r_u === undefined || r_v === undefined) continue;
+        if (rU === undefined || rV === undefined) continue;
 
-        A += (r_u - r_v) ** 2
+        A += (rU - rV) ** 2
       }
 
       return Math.sqrt(A);
@@ -137,9 +136,9 @@ export class Recommender {
 
   calculateSimilarityMatrix() {
     const similarityMatrix = [];
-    for(let u = 0; u < this.utility_matrix.length; u++) {
+    for(let u = 0; u < this.utilityMatrix.length; u++) {
       similarityMatrix.push([]);
-      for (let v = 0; v < this.utility_matrix.length; v++) {
+      for (let v = 0; v < this.utilityMatrix.length; v++) {
         similarityMatrix[u].push(this.sim(u, v));
       }
     }
@@ -147,33 +146,33 @@ export class Recommender {
     return similarityMatrix;
   }
 
-  // Returns user_index mean of califications
-  getUserMean(user_index) {
-    const user_califications = this.utility_matrix[user_index];
+  // Returns userIndex mean of califications
+  getUserMean(userIndex) {
+    const userCalifications = this.utilityMatrix[userIndex];
 
-    if (!user_califications) throw new Error(`There's not any user at index ${user_index}`);
+    if (!userCalifications) throw new Error(`There's not any user at index ${userIndex}`);
 
-    let num_of_califications = 0;
-    const califications_sum = user_califications.reduce((sum, calif) => {
+    let numOfCalifications = 0;
+    const calificationsSum = userCalifications.reduce((sum, calif) => {
       if (calif === undefined) return sum;
 
-      num_of_califications++;
+      numOfCalifications++;
       return sum + calif;
     }, 0);
 
-    return califications_sum / num_of_califications;
+    return calificationsSum / numOfCalifications;
   }
 
-  // Gets k nearest neighbors to user_index user (according to sim function)
+  // Gets k nearest neighbors to userIndex user (according to sim function)
   getNearestNeighbors(u, neighborsNum) {
-    const user_califications = this.utility_matrix[u];
+    const userCalifications = this.utilityMatrix[u];
 
-    if (!user_califications) throw new Error(`There's not any user at index ${u}`);
+    if (!userCalifications) throw new Error(`There's not any user at index ${u}`);
 
     const similarityMatrix = this.similarityMatrix;
-    const users_similarity = similarityMatrix[u].map((sim, index) => ({ index, sim }));
+    const usersSimilarity = similarityMatrix[u].map((sim, index) => ({ index, sim }));
 
-    return users_similarity.sort((a, b) => this.similaritySorter(a.sim, b.sim))
+    return usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim))
       .slice(1, neighborsNum + 1); // Ignores similarity with u itself (1)
   }
 
@@ -189,11 +188,11 @@ export class Recommender {
         let B = 0;
 
         neighbors.forEach((neighbor) => {
-          const r_v = this.utility_matrix[neighbor.index][i];
+          const rV = this.utilityMatrix[neighbor.index][i];
 
-          if (r_v === undefined) return;
+          if (rV === undefined) return;
 
-          A += neighbor.sim * r_v;
+          A += neighbor.sim * rV;
           B += Math.abs(neighbor.sim);
         });
 
@@ -209,16 +208,16 @@ export class Recommender {
 
 
         neighbors.forEach((neighbor) => {
-          const r_v = this.utility_matrix[neighbor.index][i];
+          const rV = this.utilityMatrix[neighbor.index][i];
 
-          if (r_v === undefined) return;
+          if (rV === undefined) return;
 
-          A += neighbor.sim * (r_v - this.getUserMean(neighbor.index));
+          A += neighbor.sim * (rV - this.getUserMean(neighbor.index));
           B += Math.abs(neighbor.sim);
         });
 
-        const u_mean = this.getUserMean(u);
-        return u_mean + A / B;
+        const uMean = this.getUserMean(u);
+        return uMean + A / B;
       }
     }
   }
@@ -243,7 +242,7 @@ export class Recommender {
         throw new Error(`Unknown metric method: ${metricName}`);
     }
 
-    if (this.utility_matrix) this.setSimilarityMatrix();
+    if (this.utilityMatrix) this.setSimilarityMatrix();
     return;
   }
 
@@ -263,7 +262,7 @@ export class Recommender {
 
   // Calculate new full matrix
   calculate() {
-    return this.utility_matrix
+    return this.utilityMatrix
       .map((califications, u) => califications
         .map((calif, i) => calif !== undefined ? calif : this.predict(u, i)))
   }
