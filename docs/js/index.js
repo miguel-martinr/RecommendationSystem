@@ -120,7 +120,17 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
 
 
 
+// Show sorted neighbors for every user
+const showSortedNeighbors = () => {
+  const sortedNeighborsMatrix = recommender.similarityMatrix
+    .map(row => row.sort(recommender.similaritySorter).slice(1))
+    
 
+  console.log(sortedNeighborsMatrix);
+}
+
+
+recommender.something = showSortedNeighbors;
 
 const showOriginalMatrix = () => {
   let opts = {
