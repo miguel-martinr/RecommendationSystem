@@ -31,9 +31,10 @@ export class Recommender {
   setUtilityMatrix(matrix) {
     const not_value = "-";;
     this.utilityMatrix = matrix
+      .trim()
       .split("\n")
       .map((str_row) => str_row.trim().split(" "))
-      .map((row) => row.map((char) => char == not_value ? undefined : parseFloat(char)))
+      .map((row) => row.map((value) => value == not_value ? undefined : parseFloat(value)))
 
     this.setSimilarityMatrix();
   }

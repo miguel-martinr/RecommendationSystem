@@ -33,7 +33,8 @@
       <div class="row">
         <div class="col">
           <p>
-            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#examples" aria-expanded="false">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#examples"
+              aria-expanded="false">
               Usar un ejemplo
             </button>
           </p>
@@ -41,17 +42,20 @@
             <div class="row">
               <div class="col-sm-4">
                 <div class="card card-body" id="exampleOneBtn">
-                  <button class="btn text-primary" value="./js/example1.txt">Ejemplo 1. Matriz de utilidad 5x5. 1 incógnita</button>
+                  <button class="btn text-primary" value="./js/example1.txt">Ejemplo 1. Matriz de utilidad 5x5. 1
+                    incógnita</button>
                 </div>
               </div>
               <div class="col-sm-4">
                 <div class="card card-body" id="exampleTwoBtn">
-                  <button class="btn text-primary" value="./js/example2.txt">Ejemplo 2. Matriz de utilidad 5x5. 1 incógnita</button>
-                </div>              
+                  <button class="btn text-primary" value="./js/example2.txt">Ejemplo 2. Matriz de utilidad 5x5. 1
+                    incógnita</button>
+                </div>
               </div>
               <div class="col-sm-4">
                 <div class="card card-body" id="exampleThreeBtn">
-                  <button class="btn text-primary" value="./js/example3.txt">Ejemplo 3. Matriz de utilidad 10x5. 8 incógnitas</button>
+                  <button class="btn text-primary" value="./js/example3.txt">Ejemplo 3. Matriz de utilidad 10x5. 8
+                    incógnitas</button>
                 </div>
               </div>
             </div>
@@ -105,20 +109,48 @@
         </div>
       </div>
     </form>
-    <div class="row">
-      <div class="col-sm-12 col-md-4 text-center mt-3" >
-        <span class="h4" hidden id="matrix-one-title">Matriz de utilidad original</span>
-        <div id="matrix_container"></div>
-      </div>
-      <div class="col-sm-12 col-md-4 text-center mt-3">
-        <span class="h4" hidden id="matrix-two-title">Matriz de utilidad con predicciones</span>
-        <div id="new_matrix_container"></div>
-      </div>
-      <div class="col-sm-12 col-md-4 text-center mt-3">
-        <span class="h4" hidden id="matrix-three-title">Matriz de similitud</span>
-        <div id="similarity_matrix_container"></div>
-      </div>
-    </div>
+
+    
+      <div class="card">
+        <div class="card-header" id="headingOne" hidden>
+          <h5 class="mb-0">
+            <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#utilityMatrixCollapse">
+              Matriz de utilidad
+            </button>
+          </h5>
+        </div>
+    
+        <div id="utilityMatrixCollapse" class="collapse" aria-labelledby="headingOne">
+          <div class="card-body" id="matrix_container">            
+          </div>
+        </div>
+      </div>  
+      <div class="card">
+        <div class="card-header" id="headingTwo" hidden>
+          <h5 class="mb-0">
+            <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#similarityMatrixCollapse">
+              Matriz de similitud
+            </button>
+          </h5>
+        </div>
+        <div id="similarityMatrixCollapse" class="collapse" aria-labelledby="headingTwo">
+          <div class="card-body" id="similarity_matrix_container">            
+          </div>
+        </div>
+      </div>  
+      <div class="card">
+        <div class="card-header" id="headingThree" hidden>
+          <h5 class="mb-0">
+            <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#calculatedMatrixCollapse">
+              Matriz de utilidad con predicciones
+            </button>
+          </h5>
+        </div>
+        <div id="calculatedMatrixCollapse" class="collapse" aria-labelledby="headingThree">
+          <div class="card-body" id="new_matrix_container">            
+          </div>
+        </div>
+      </div>         
   </div>
 
 

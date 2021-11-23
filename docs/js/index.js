@@ -59,7 +59,7 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
 
   // Shows new similarity Matrix
   showSimilarityMatrix();
-
+  document.getElementById("headingThree").scrollIntoView();
   document.getElementById("downloadBtnContainer").hidden = false;
 });
 
@@ -122,7 +122,15 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
 
 
 
-
+const showOriginalMatrix = () => {
+  let opts = {
+    markedCells: recommender.emptyItems,
+    styleClasses: ["text-white", "bg-danger"],
+    rowHeaders: "User",
+    colHeaders: "Item"
+  };
+  showMatrix('matrix_container', 'headingOne', opts, Recommender.formatMatrix(recommender.utilityMatrix));
+}
 
 
 const showSimilarityMatrix = () => {
@@ -134,7 +142,7 @@ const showSimilarityMatrix = () => {
     rowHeaders: "User",
     colHeaders: "User"
   };
-  showMatrix('similarity_matrix_container', 'matrix-three-title', opts, formattedSimilarityMatrix)
+  showMatrix('similarity_matrix_container', 'headingTwo', opts, formattedSimilarityMatrix)
 }
 
 const showCalculatedMatrix = () => {
@@ -145,7 +153,7 @@ const showCalculatedMatrix = () => {
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
 
   // Removes previous calculated matrix
-  removeMatrix('new_matrix_container', 'matrix-two-title');
+  removeMatrix('new_matrix_container', 'headingThree');
 
   const opts = {
     markedCells: recommender.emptyItems,
@@ -155,32 +163,25 @@ const showCalculatedMatrix = () => {
   };
 
   // Shows new calculated matrix
-  showMatrix('new_matrix_container', 'matrix-two-title', opts, formattedMatrix);
-}
-
-const showOriginalMatrix = () => {
-  let opts = {
-    markedCells: recommender.emptyItems,
-    styleClasses: ["text-white", "bg-danger"],
-    rowHeaders: "User",
-    colHeaders: "Item"
-  };
-  showMatrix('matrix_container', 'matrix-one-title', opts, Recommender.formatMatrix(recommender.utilityMatrix));
+  showMatrix('new_matrix_container', 'headingThree', opts, formattedMatrix);
 }
 
 
 
 
-const showMatrix = (matrixContainerId, titleId, opts, matrix) => {
+
+
+const showMatrix = (matrixContainerId, headerId, opts, matrix) => {
+
   const matrixContainer = document.getElementById(matrixContainerId);
   matrixContainer.innerHTML = "";
 
-  document.getElementById(titleId).hidden = false;
+  document.getElementById(headerId).hidden = false;
   matrixContainer.appendChild(createTable(matrix, opts));
 }
 
-const removeMatrix = (matrixContainerId, titleId) => {
-  document.getElementById(titleId).hidden = true;
+const removeMatrix = (matrixContainerId, headerId) => {
+  document.getElementById(headerId).hidden = true;
   const matrixContainer = document.getElementById(matrixContainerId);
   matrixContainer.innerHTML = "";
 }
