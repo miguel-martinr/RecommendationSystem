@@ -34,7 +34,7 @@ export class Recommender {
       .split("\n")
       .map((str_row) => str_row.trim().split(" "))
       .map((row) => row.map((char) => char == not_value ? undefined : parseFloat(char)))
-        
+
     this.setSimilarityMatrix();
   }
 
@@ -136,7 +136,7 @@ export class Recommender {
 
   calculateSimilarityMatrix() {
     const similarityMatrix = [];
-    for(let u = 0; u < this.utilityMatrix.length; u++) {
+    for (let u = 0; u < this.utilityMatrix.length; u++) {
       similarityMatrix.push([]);
       for (let v = 0; v < this.utilityMatrix.length; v++) {
         similarityMatrix[u].push(this.sim(u, v));
@@ -230,33 +230,43 @@ export class Recommender {
         this.sim = this.similarityCalculators.pearson;
         this.similaritySorter = sorters.decrescent;
         break;
+
       case metrics.cosine:
         this.sim = this.similarityCalculators.cosine;
         this.similaritySorter = sorters.decrescent;
         break;
+
       case metrics.euclidean:
         this.sim = this.similarityCalculators.euclidean;
         this.similaritySorter = sorters.increscent;
         break;
+
       default:
         throw new Error(`Unknown metric method: ${metricName}`);
     }
 
+    this.metricName = metricName;
     if (this.utilityMatrix) this.setSimilarityMatrix();
     return;
   }
 
   setPredictor(predictorName) {
     switch (predictorName) {
+
       case predictors.collaborativeFiltering.userBased.simple:
         this.predict = this.collaborativeFiltering.userBased.simple;
-        return;
+        break;
+
       case predictors.collaborativeFiltering.userBased.meanDiff:
         this.predict = this.collaborativeFiltering.userBased.meanDiff;
-        return;
+        break;
+
       default:
         throw new Error(`Unknown prediction method: ${predictorName}`);
+
     }
+    
+    this.predictorName = predictorName;
   }
 
 

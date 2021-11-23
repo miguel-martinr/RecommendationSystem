@@ -7,15 +7,20 @@ window.recommender = recommender;
 // Read matrix
 let reader = new FileReader()
 
-reader.onload = () => {
-  
+const setUtilityMatrix = (rawMatrixText) => {
   // Show new original matrix
-  recommender.setUtilityMatrix(reader.result);
+  recommender.setUtilityMatrix(rawMatrixText);
   showOriginalMatrix();
 
   // Show similarity matrix
   showSimilarityMatrix();
+
 }
+
+reader.onload = () => {
+  setUtilityMatrix(reader.result);
+}
+
 
 const readMatrix = (input_event) => {
   const { target } = input_event;
@@ -24,12 +29,12 @@ const readMatrix = (input_event) => {
     alert("Debes subir 1 matriz de utilidad");
   }
 
-  const file = file_input.files[0];
+  const file = fileInput.files[0];
   reader.readAsText(file);
 }
 
-const file_input = document.getElementById('utilityMatrix_input');
-file_input.addEventListener('input', readMatrix);
+const fileInput = document.getElementById('utilityMatrix_input');
+fileInput.addEventListener('input', readMatrix);
 
 // Change similarity metric
 document.getElementById('metrics_dropdown').addEventListener('change', (ev) => {
@@ -54,12 +59,75 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
 
   // Shows new similarity Matrix
   showSimilarityMatrix();
+
+  document.getElementById("downloadBtnContainer").hidden = false;
 });
+
+
+
+// Read matrix from example
+const exampleButtonsIds = ["exampleOneBtn", "exampleTwoBtn", "exampleThreeBtn"];
+exampleButtonsIds.map(id => document.getElementById(id)).forEach(btn => {
+  btn.addEventListener('click', (ev) => {
+    const temp = btn.innerHTML;
+    btn.innerHTML = "Cargando...";
+    const { target } = ev;
+    axios.get(target.value).then(res => {
+      btn.innerHTML = temp;
+      setUtilityMatrix(res.data);
+    });
+  });
+});
+
+
+// Download report
+document.getElementById('downloadBtn').addEventListener('click', () => {
+
+  const reportJson = {
+    utilityMatrix: recommender.utilityMatrix,
+    similarityMatrix: recommender.similarityMatrix,
+    metric: recommender.metricName,
+    predictionMethod: recommender.predictorName,
+    numOfNeighbors: recommender.numOfNeighbors,
+    predictedMatrix: recommender.calculate()
+  }
+
+
+
+  let tempAnchor = document.createElement('a');
+
+  let stringifiedReport = JSON.stringify(reportJson).replace(/(\d),\n/g, "$1,");
+  stringifiedReport = stringifiedReport.replace(/(\"\w*\"):/g, "\n  $1:");
+  stringifiedReport = stringifiedReport.replace(/(\"\w*\"):\[/g, "\n  $1:\[");
+  stringifiedReport = stringifiedReport.replace(/(\:\[)/g, ":\n  [");
+  stringifiedReport = stringifiedReport.replace(/(\[\[)/g, "[\n    [");
+  stringifiedReport = stringifiedReport.replace(/(\],)/g, "],\n");
+  stringifiedReport = stringifiedReport.replace(/(\],\n\[)/g, "],\n    [");
+  stringifiedReport = stringifiedReport.replace(/(\]\])/g, "\]\n  \]");
+  stringifiedReport = stringifiedReport.replace(/(\]\})/g, "\]\n\n\}");
+  
+
+  tempAnchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedReport));
+  tempAnchor.setAttribute('download', "RecommendationSystemReport.json");
+
+  tempAnchor.style.display = 'none';
+  document.body.appendChild(tempAnchor);
+
+  tempAnchor.click();
+
+  document.body.removeChild(tempAnchor);
+});
+
+
+
+
+
+
 
 
 const showSimilarityMatrix = () => {
   const formattedSimilarityMatrix = Recommender.formatMatrix(recommender.similarityMatrix);
-  
+
   const opts = {
     markedCells: "diagonal",
     styleClasses: ["text-white", "bg-dark"],
@@ -72,20 +140,20 @@ const showSimilarityMatrix = () => {
 const showCalculatedMatrix = () => {
   const numOfNeighbors = parseInt(document.getElementById('neighbors_number_input').value);
   recommender.numOfNeighbors = numOfNeighbors;
-  
+
   const newMatrix = recommender.calculate();
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
-  
-  // Removes previos calculated matrix
+
+  // Removes previous calculated matrix
   removeMatrix('new_matrix_container', 'matrix-two-title');
-  
+
   const opts = {
     markedCells: recommender.emptyItems,
     styleClasses: ["text-white", "bg-success"],
     rowHeaders: "User",
     colHeaders: "Item"
   };
-  
+
   // Shows new calculated matrix
   showMatrix('new_matrix_container', 'matrix-two-title', opts, formattedMatrix);
 }
@@ -103,14 +171,12 @@ const showOriginalMatrix = () => {
 
 
 
-
-
 const showMatrix = (matrixContainerId, titleId, opts, matrix) => {
   const matrixContainer = document.getElementById(matrixContainerId);
   matrixContainer.innerHTML = "";
 
   document.getElementById(titleId).hidden = false;
-  matrixContainer.appendChild(createTable(matrix, opts));  
+  matrixContainer.appendChild(createTable(matrix, opts));
 }
 
 const removeMatrix = (matrixContainerId, titleId) => {
