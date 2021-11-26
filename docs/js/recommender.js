@@ -65,8 +65,8 @@ export class Recommender {
       let Bu = 0;
       let Bv = 0;
 
-      const uMean = this.getUserMean(u);
-      const vMean = this.getUserMean(v);
+      const uMean = this.getUserMeanRespectTo(u, v);
+      const vMean = this.getUserMeanRespectTo(v, u);
 
       for (let i = 0; i < this.utilityMatrix[0].length; i++) {
 
@@ -162,6 +162,22 @@ export class Recommender {
     }, 0);
 
     return calificationsSum / numOfCalifications;
+  }
+
+  getUserMeanRespectTo(u, v) {
+    const vCalifications = this.utilityMatrix[v];
+    if (!vCalifications) throw new Error(`There's not any user at index ${v}`);
+
+    const uCalifications = this.utilityMatrix[u].filter((val, r) => vCalifications[r] !== undefined);
+    if (!uCalifications) throw new Error(`There's not any user at index ${u}`);
+
+    let numOfCalifications = 0;
+    return uCalifications.reduce((acc, calif) => {
+      if (calif == undefined) return acc;
+
+      numOfCalifications++;
+      return acc + calif;
+    }, 0) / numOfCalifications;
   }
 
   // Gets k nearest neighbors to userIndex user (according to sim function)
@@ -266,7 +282,7 @@ export class Recommender {
         throw new Error(`Unknown prediction method: ${predictorName}`);
 
     }
-    
+
     this.predictorName = predictorName;
   }
 
