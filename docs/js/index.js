@@ -112,7 +112,14 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
   
 
   tempAnchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedReport));
-  tempAnchor.setAttribute('download', "RecommendationSystemReport.json");
+  const rows = recommender.utilityMatrix.length;
+  const columns = recommender.utilityMatrix[0].length;
+  const {metricName, numOfNeighbors} = recommender;
+  let predictorName = recommender.predictorName;
+  predictorName = predictorName.substring(predictorName.lastIndexOf("/") + 1);
+
+
+  tempAnchor.setAttribute('download', `matrix-${rows}-${columns}-${metricName}-${numOfNeighbors}-${predictorName}.json`);
 
   tempAnchor.style.display = 'none';
   document.body.appendChild(tempAnchor);
