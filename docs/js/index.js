@@ -15,6 +15,9 @@ const setUtilityMatrix = (rawMatrixText) => {
   // Show similarity matrix
   showSimilarityMatrix();
 
+  // Show sorted neighbors for every user
+  showSortedNeighbors();
+
 }
 
 reader.onload = () => {
@@ -56,6 +59,7 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   }
 
   showCalculatedMatrix();
+  showSortedNeighbors();
 
   // Shows new similarity Matrix
   showSimilarityMatrix();
@@ -120,13 +124,27 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
 
 
 
+
+
+
 // Show sorted neighbors for every user
 const showSortedNeighbors = () => {
-  const sortedNeighborsMatrix = recommender.similarityMatrix
-    .map(row => row.sort(recommender.similaritySorter).slice(1))
     
+  const simAndIndex = recommender.similarityMatrix.map((sims) => sims.map((sim, v) => ({sim, v})));
+  const sorted = simAndIndex.map(row => row.sort((a, b) => recommender.similaritySorter(a.sim, b.sim)).slice(1));
+  const text = sorted.map(row => row.map(({sim, v}) => `[${v + 1}]: ${sim.toFixed(2)}`));
 
-  console.log(sortedNeighborsMatrix);
+  let markedCells = [...Array(text.length).keys()];
+  markedCells = markedCells.map(u => [...Array(recommender.numOfNeighbors).keys()].map(n => [u, n])).flat();
+  // markedCells = [];
+  const opts = {
+    markedCells,
+    styleClasses: ["text-white", "bg-primary"],
+    rowHeaders: "User",
+    colHeaders: "",
+  }
+
+  showMatrix('sorted_neighbors_container', 'headingFour', opts, text);
 }
 
 
@@ -157,7 +175,7 @@ const showSimilarityMatrix = () => {
 
 const showCalculatedMatrix = () => {
   const numOfNeighbors = parseInt(document.getElementById('neighbors_number_input').value);
-  recommender.numOfNeighbors = numOfNeighbors;
+  recommender.numOfNeighbors = Math.min(numOfNeighbors, recommender.utilityMatrix.length);
 
   const newMatrix = recommender.calculate();
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
