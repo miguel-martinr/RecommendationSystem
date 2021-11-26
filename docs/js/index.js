@@ -148,8 +148,6 @@ const showSortedNeighbors = () => {
 }
 
 
-recommender.something = showSortedNeighbors;
-
 const showOriginalMatrix = () => {
   let opts = {
     markedCells: recommender.emptyItems,
@@ -174,8 +172,11 @@ const showSimilarityMatrix = () => {
 }
 
 const showCalculatedMatrix = () => {
-  const numOfNeighbors = parseInt(document.getElementById('neighbors_number_input').value);
+  const numOfNeighborsInput = document.getElementById('neighbors_number_input');
+  const numOfNeighbors = parseInt(numOfNeighborsInput.value);
   recommender.numOfNeighbors = Math.min(numOfNeighbors, recommender.utilityMatrix.length);
+  recommender.numOfNeighbors = Math.min(recommender.numOfNeighbors, recommender.utilityMatrix.length - 1);
+  numOfNeighborsInput.value = recommender.numOfNeighbors;
 
   const newMatrix = recommender.calculate();
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
