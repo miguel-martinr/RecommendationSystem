@@ -65,8 +65,8 @@ export class Recommender {
       let Bu = 0;
       let Bv = 0;
 
-      const uMean = this.getUserMeanRespectTo(u, v);
-      const vMean = this.getUserMeanRespectTo(v, u);
+      const uMean = this.getUserMean(u);
+      const vMean = this.getUserMean(v);
 
       for (let i = 0; i < this.utilityMatrix[0].length; i++) {
 
@@ -164,24 +164,10 @@ export class Recommender {
     return calificationsSum / numOfCalifications;
   }
 
-  getUserMeanRespectTo(u, v) {
-    const vCalifications = this.utilityMatrix[v];
-    if (!vCalifications) throw new Error(`There's not any user at index ${v}`);
 
-    const uCalifications = this.utilityMatrix[u].filter((val, r) => vCalifications[r] !== undefined);
-    if (!uCalifications) throw new Error(`There's not any user at index ${u}`);
-
-    let numOfCalifications = 0;
-    return uCalifications.reduce((acc, calif) => {
-      if (calif == undefined) return acc;
-
-      numOfCalifications++;
-      return acc + calif;
-    }, 0) / numOfCalifications;
-  }
 
   // Gets k nearest neighbors to userIndex user (according to sim function)
-  getNearestNeighbors(u, neighborsNum) {
+  getNearestNeighbors(u, neighborsNum, i) {
     const userCalifications = this.utilityMatrix[u];
 
     if (!userCalifications) throw new Error(`There's not any user at index ${u}`);
@@ -189,8 +175,18 @@ export class Recommender {
     const similarityMatrix = this.similarityMatrix;
     const usersSimilarity = similarityMatrix[u].map((sim, index) => ({ index, sim }));
 
-    return usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim))
-      .slice(1, neighborsNum + 1); // Ignores similarity with u itself (1)
+    const sorted = usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim))
+    .slice(1); // Ignores similarity with u itself (1)
+
+    let result = [];
+    let j = 0;
+    while (result.length < neighborsNum && j < sorted.length) {
+      const neighbor = sorted[j++];
+      if (this.utilityMatrix[neighbor.index][i] === undefined) continue;
+      result.push(neighbor);
+    }
+
+    return  result;
   }
 
 
@@ -198,7 +194,7 @@ export class Recommender {
   collaborativeFiltering = {
     userBased: {
       simple(u, i) {
-        const neighbors = this.getNearestNeighbors(u, this.numOfNeighbors);
+        const neighbors = this.getNearestNeighbors(u, this.numOfNeighbors, i);
         // SUM[ sim(u, v) * r(v, i)]
         let A = 0;
         // SUM[ |sim(u, v)|]
@@ -206,8 +202,6 @@ export class Recommender {
 
         neighbors.forEach((neighbor) => {
           const rV = this.utilityMatrix[neighbor.index][i];
-
-          if (rV === undefined) return;
 
           A += neighbor.sim * rV;
           B += Math.abs(neighbor.sim);
@@ -217,7 +211,7 @@ export class Recommender {
       },
 
       meanDiff(u, i) {
-        const neighbors = this.getNearestNeighbors(u, this.numOfNeighbors);
+        const neighbors = this.getNearestNeighbors(u, this.numOfNeighbors, i);
         // SUM[ sim(u, v) * r(v, i)]
         let A = 0;
         // SUM[ |sim(u, v)|]

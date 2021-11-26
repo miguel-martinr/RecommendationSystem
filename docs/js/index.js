@@ -15,6 +15,9 @@ const setUtilityMatrix = (rawMatrixText) => {
   // Show similarity matrix
   showSimilarityMatrix();
 
+  // Show sorted neighbors for every user
+  showSortedNeighbors();
+
 }
 
 reader.onload = () => {
@@ -56,6 +59,7 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   }
 
   showCalculatedMatrix();
+  showSortedNeighbors();
 
   // Shows new similarity Matrix
   showSimilarityMatrix();
@@ -108,7 +112,14 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
   
 
   tempAnchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(stringifiedReport));
-  tempAnchor.setAttribute('download', "RecommendationSystemReport.json");
+  const rows = recommender.utilityMatrix.length;
+  const columns = recommender.utilityMatrix[0].length;
+  const {metricName, numOfNeighbors} = recommender;
+  let predictorName = recommender.predictorName;
+  predictorName = predictorName.substring(predictorName.lastIndexOf("/") + 1);
+
+
+  tempAnchor.setAttribute('download', `matrix-${rows}-${columns}-${metricName}-${numOfNeighbors}-${predictorName}.json`);
 
   tempAnchor.style.display = 'none';
   document.body.appendChild(tempAnchor);
@@ -120,6 +131,28 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
 
 
 
+
+
+
+// Show sorted neighbors for every user
+const showSortedNeighbors = () => {
+    
+  const simAndIndex = recommender.similarityMatrix.map((sims) => sims.map((sim, v) => ({sim, v})));
+  const sorted = simAndIndex.map(row => row.sort((a, b) => recommender.similaritySorter(a.sim, b.sim)).slice(1));
+  const text = sorted.map(row => row.map(({sim, v}) => `[${v + 1}]: ${sim.toFixed(2)}`));
+
+  let markedCells = [...Array(text.length).keys()];
+  markedCells = markedCells.map(u => [...Array(recommender.numOfNeighbors).keys()].map(n => [u, n])).flat();
+  // markedCells = [];
+  const opts = {
+    markedCells,
+    styleClasses: ["text-white", "bg-primary"],
+    rowHeaders: "User",
+    colHeaders: "",
+  }
+
+  showMatrix('sorted_neighbors_container', 'headingFour', opts, text);
+}
 
 
 const showOriginalMatrix = () => {
@@ -146,8 +179,11 @@ const showSimilarityMatrix = () => {
 }
 
 const showCalculatedMatrix = () => {
-  const numOfNeighbors = parseInt(document.getElementById('neighbors_number_input').value);
-  recommender.numOfNeighbors = numOfNeighbors;
+  const numOfNeighborsInput = document.getElementById('neighbors_number_input');
+  const numOfNeighbors = parseInt(numOfNeighborsInput.value);
+  recommender.numOfNeighbors = Math.min(numOfNeighbors, recommender.utilityMatrix.length);
+  recommender.numOfNeighbors = Math.min(recommender.numOfNeighbors, recommender.utilityMatrix.length - 1);
+  numOfNeighborsInput.value = recommender.numOfNeighbors;
 
   const newMatrix = recommender.calculate();
   const formattedMatrix = Recommender.formatMatrix(newMatrix);
