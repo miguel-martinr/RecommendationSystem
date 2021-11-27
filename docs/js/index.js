@@ -58,7 +58,7 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
     return alert("Debes subir 1 matriz de utilidad.");
   }
 
-  showCalculatedMatrix();
+  const predictedMatrix = showCalculatedMatrix();
   showSortedNeighbors();
 
   // Shows new similarity Matrix
@@ -75,7 +75,7 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
 
   logElement.value = recommender.getNeighborLog().map(({u, i, neighborsUsed}) => {
     neighborsUsed = neighborsUsed.map(u => u + 1);
-    return `Para calcular la valoración del usuario ${u+ 1} sobre el ítem ${i + 1} se han tenido en cuenta ${neighborsUsed.length} vecinos: ${neighborsUsed}`
+    return `Para calcular la valoración del usuario ${u+ 1} sobre el ítem ${i + 1} se han tenido en cuenta ${neighborsUsed.length} vecinos: ${neighborsUsed} -> ${predictedMatrix[u][i].toFixed(2)}`
   }).join("\n");  
 });
 
@@ -212,6 +212,7 @@ const showCalculatedMatrix = () => {
 
   // Shows new calculated matrix
   showMatrix('new_matrix_container', 'headingThree', opts, formattedMatrix);
+  return newMatrix;
 }
 
 
