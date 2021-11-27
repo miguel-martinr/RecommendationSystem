@@ -21,6 +21,16 @@ const metrics = {
 
 
 export class Recommender {
+
+  /**
+   * this.numOfNeighbors: Number of neighbors to consider
+   * this.metricName: Metric to use (name)
+   * this.predictorName: Prediction method to use (name)
+   * this.utilityMatrix: Matrix of califications
+   * this.similarityMatrix: Matrix of similarities
+   */
+
+
   constructor() {
     this.numOfNeighbors = 3;
 
@@ -168,15 +178,15 @@ export class Recommender {
 
   // Gets k nearest neighbors to userIndex user (according to sim function)
   getNearestNeighbors(u, neighborsNum, i) {
+    const iUsers = this.utilityMatrix.map((ratings, u) => ratings[i] === undefined ? undefined : u).filter(u => u !== undefined); // Get all users that have rated item i
     const userCalifications = this.utilityMatrix[u];
 
     if (!userCalifications) throw new Error(`There's not any user at index ${u}`);
 
     const similarityMatrix = this.similarityMatrix;
-    const usersSimilarity = similarityMatrix[u].map((sim, index) => ({ index, sim }));
+    const usersSimilarity = iUsers.map(v => ({index: v, sim: similarityMatrix[u][v]}));
 
-    const sorted = usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim))
-    .slice(1); // Ignores similarity with u itself (1)
+    const sorted = usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim));
 
     let result = [];
     let j = 0;
@@ -186,7 +196,7 @@ export class Recommender {
       result.push(neighbor);
     }
 
-    return  result;
+    return result;
   }
 
 
@@ -281,7 +291,7 @@ export class Recommender {
   }
 
 
-  // Calculate new full matrix
+  // Calculate new full matrix (with predictions)
   calculate() {
     return this.utilityMatrix
       .map((califications, u) => califications
