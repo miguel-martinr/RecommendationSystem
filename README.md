@@ -106,7 +106,7 @@ Estos métodos son:
 
 * `simple(u, i)`: Aplica la fórmula de predicción sin tener en cuenta la media 
 
-![](./docs/media/simple_formula.PNG)
+![](./docs/media/simple_formula.png)
 
 + `meanDiff(u, i)`: Aplica la fórmula de predicción teniendo en cuenta la media de calificaciones de los usuarios 
 
