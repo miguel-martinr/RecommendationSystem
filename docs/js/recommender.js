@@ -28,6 +28,7 @@ export class Recommender {
    * this.predictorName: Prediction method to use (name)
    * this.utilityMatrix: Matrix of califications
    * this.similarityMatrix: Matrix of similarities
+   * this.similaritySorter: Function to sort similarities
    */
 
 
@@ -186,15 +187,7 @@ export class Recommender {
     const similarityMatrix = this.similarityMatrix;
     const usersSimilarity = iUsers.map(v => ({index: v, sim: similarityMatrix[u][v]}));
 
-    const sorted = usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim));
-
-    let result = [];
-    let j = 0;
-    while (result.length < neighborsNum && j < sorted.length) {
-      const neighbor = sorted[j++];
-      if (this.utilityMatrix[neighbor.index][i] === undefined) continue;
-      result.push(neighbor);
-    }
+    const result = usersSimilarity.sort((a, b) => this.similaritySorter(a.sim, b.sim)).slice(0, neighborsNum);
 
     return result;
   }
