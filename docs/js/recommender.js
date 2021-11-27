@@ -292,6 +292,18 @@ export class Recommender {
   }
 
 
+  getNeighborLog() {
+    return this.emptyItems.map(([u, i]) => {
+      const neighborsUsed = this.getNearestNeighbors(u, this.numOfNeighbors, i).map(n => n.index);
+      return {
+        u,
+        i,
+        neighborsUsed
+      }
+    });
+  }
+
+
   static printMatrix(matrix) {
     return this.formatMatrix(matrix).map(row => row.join(" ")).join("\n");
   }
@@ -299,4 +311,6 @@ export class Recommender {
   static formatMatrix(matrix) {
     return matrix.map((row) => row.map(val => val === undefined ? "-" : val.toFixed(2)));
   }
+
+
 }

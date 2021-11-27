@@ -65,6 +65,18 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   showSimilarityMatrix();
   document.getElementById("headingThree").scrollIntoView();
   document.getElementById("downloadBtnContainer").hidden = false;
+
+
+  // Shows log
+  document.getElementById("headingFive").hidden = false;
+  
+  const logElement = document.getElementById("log");
+  logElement.value = "";
+
+  logElement.value = recommender.getNeighborLog().map(({u, i, neighborsUsed}) => {
+    neighborsUsed = neighborsUsed.map(u => u + 1);
+    return `Para calcular la valoración del usuario ${u+ 1} sobre el ítem ${i + 1} se han tenido en cuenta ${neighborsUsed.length} vecinos: ${neighborsUsed}`
+  }).join("\n");  
 });
 
 
