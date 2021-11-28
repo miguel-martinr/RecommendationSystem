@@ -70,6 +70,7 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   // Shows log
   document.getElementById("headingFive").hidden = false;
   
+  
   const logElement = document.getElementById("log");
   logElement.value = "";
 
