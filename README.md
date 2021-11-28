@@ -101,11 +101,11 @@ Estos métodos son:
 
 * `simple(u, i)`: Aplica la fórmula de predicción sin tener en cuenta la media 
 
-![](./docs/media/simple_formula.png)
+![](./media/simple_formula.png)
 
 + `meanDiff(u, i)`: Aplica la fórmula de predicción teniendo en cuenta la media de calificaciones de los usuarios 
 
-![](./docs/media/meandiff_formula.png)
+![](./media/meandiff_formula.png)
 
 
 El método `predict(u, i)` se utiliza para predecir la valoración del usuario u para el ítem i y puede ser cualquiera de los métodos antes descrito.
