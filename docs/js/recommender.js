@@ -1,3 +1,5 @@
+const MAX_RATING = 5;
+
 const sorters = {
   increscent: (a, b) => a - b,
   decrescent: (a, b) => b - a
@@ -18,6 +20,12 @@ const metrics = {
   euclidean: "euclidean"
 }
 
+const normalizers = {
+  pearsonNormalizer: (val) => val/2 + 1/2,
+  cosineNormalizer: (val) => val/2 + 1/2,
+  euclideanNormalizer: (val, numbOfItems) => (-val / Math.sqrt((MAX_RATING ** 2) * numbOfItems)) + 1
+}
+
 
 
 export class Recommender {
@@ -35,6 +43,7 @@ export class Recommender {
   constructor() {
     this.numOfNeighbors = 3;
 
+    this.similaritySorter = sorters.decrescent;
     this.setMetric(metrics.pearson);
     this.setPredictor(predictors.collaborativeFiltering.userBased.meanDiff);
   }
@@ -64,6 +73,7 @@ export class Recommender {
     });
     return positions;
   }
+  
 
   // Similarity calculators
   similarityCalculators = {
@@ -151,7 +161,8 @@ export class Recommender {
     for (let u = 0; u < this.utilityMatrix.length; u++) {
       similarityMatrix.push([]);
       for (let v = 0; v < this.utilityMatrix.length; v++) {
-        similarityMatrix[u].push(this.sim(u, v));
+        const normalizedSim = this.simNormalizer(this.sim(u, v), this.utilityMatrix[0].length);
+        similarityMatrix[u].push(normalizedSim);
       }
     }
 
@@ -180,8 +191,8 @@ export class Recommender {
   // Gets k nearest neighbors to userIndex user (according to sim function)
   getNearestNeighbors(u, neighborsNum, i) {
     const iUsers = this.utilityMatrix.map((ratings, u) => ratings[i] === undefined ? undefined : u).filter(u => u !== undefined); // Get all users that have rated item i
+    
     const userCalifications = this.utilityMatrix[u];
-
     if (!userCalifications) throw new Error(`There's not any user at index ${u}`);
 
     const similarityMatrix = this.similarityMatrix;
@@ -224,7 +235,6 @@ export class Recommender {
         neighbors.forEach((neighbor) => {
           const rV = this.utilityMatrix[neighbor.index][i];
 
-          if (rV === undefined) return;
 
           A += neighbor.sim * (rV - this.getUserMean(neighbor.index));
           B += Math.abs(neighbor.sim);
@@ -242,17 +252,17 @@ export class Recommender {
     switch (metricName) {
       case metrics.pearson:
         this.sim = this.similarityCalculators.pearson;
-        this.similaritySorter = sorters.decrescent;
+        this.simNormalizer = normalizers.pearsonNormalizer;
         break;
 
       case metrics.cosine:
         this.sim = this.similarityCalculators.cosine;
-        this.similaritySorter = sorters.decrescent;
+        this.simNormalizer = normalizers.cosineNormalizer;
         break;
 
       case metrics.euclidean:
         this.sim = this.similarityCalculators.euclidean;
-        this.similaritySorter = sorters.increscent;
+        this.simNormalizer = normalizers.euclideanNormalizer;
         break;
 
       default:

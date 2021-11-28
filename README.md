@@ -12,6 +12,7 @@ Se trata de la clase principal, que contiene los siguientes atributos:
 * **predictorName**: Nombre del método de predicción que se está usando (`userBased/collaborativeFiltering/simple`, `userBased/collaborativeFiltering/meanDiff`)
 * **utilityMatrix**: Matriz de utilidad cargada (sin predicciones) donde cada valoración es un número y cada valoración vacía es `undefined`.
 * **similarityMatrix**: Matriz de similitudes (usuarios x usuarios)
+* **simNormalizer**: Función para normalizar los resultados de las métricas.
 
 ```JavaScript
 const matrix = `1 2 -\n4 5 6`;
@@ -48,7 +49,11 @@ Si se le pasa una matriz, se define como la nueva matriz de similitud, si no, se
 Devuelve un array de arrays de la forma [u, i] que representan las posiciones de las valoraciones que están vacías en la matriz de utilidad.
 
 ### `calculateSimilarityMatrix()`
-Calcula y devuelve la matriz de similitud a partir de la matriz de utilidad cargada usando para ello la métrica activa actualmente.
+Calcula y devuelve la matriz de similitud a partir de la matriz de utilidad cargada usando para ello la métrica activa actualmente normalizada.
+
+Para normalizar los resultados de las  distintas métricas se utiliza el método `this.simNormalizer(metric, numOfItems)`, que depende de la métrica activa.
+
+Esta función "mapea" el resultado de la métrica en el intervalo [0, 1], donde 0 equivale a la mínima similitud y 1 a la máxima.
 
 ### `getUserMean(u)`
 Devuelve la media de calificaciones del usuario u teniendo en cuenta todas las valoraciones que el usuario haya realizado.
@@ -69,18 +74,6 @@ Devuelve un vector de objetos con la forma `{index, sim}`, que representa, como 
 
 Esto lo hace primero buscando los índices de aquellos usuarios que hayan calificado al ítem i, luego, para esos usuarios, busca las similitudes con el usuario u y las ordena para, finalmente, quedarse con los k vecinos más similares. 
 
-Para ordenar los vecinos se utiliza el método `Array.sort` pasándole como argumento el atributo `similaritySorter`, de esta forma, se puede definir la forma de ordenar los vecinos para cada una de las métrica utilizadas:
-
-```JavaScript
-const sorters = {
-  increscent: (a, b) => a - b,
-  decrescent: (a, b) => b - a
-}
-```
-
-Por ejemplo, para la métricas `pearson` y `cosine` se utiliza el ordenador `decrescent`, mientras que para `eculidean` se utiliza el ordenador `increscent`.
-
-Este ordenador se actualiza cada vez que se llama al método `setMetric`.
 
 
 ***Nota** no siempre hay neighborsNum (o más) que también han calificado al ítem i, por lo que el número de vecinos tenido en cuenta puede ser menor a neghborsNum*

@@ -12,6 +12,9 @@ const setUtilityMatrix = (rawMatrixText) => {
   recommender.setUtilityMatrix(rawMatrixText);
   showOriginalMatrix();
 
+  // Show metrics values
+  showMetricsMatrix();
+
   // Show similarity matrix
   showSimilarityMatrix();
 
@@ -66,11 +69,14 @@ document.getElementById('calc_form').addEventListener('submit', (ev) => {
   document.getElementById("headingThree").scrollIntoView();
   document.getElementById("downloadBtnContainer").hidden = false;
 
+  // Show metrics values
+  showMetricsMatrix();
+
 
   // Shows log
   document.getElementById("headingFive").hidden = false;
   
-  
+
   const logElement = document.getElementById("log");
   logElement.value = "";
 
@@ -216,7 +222,27 @@ const showCalculatedMatrix = () => {
   return newMatrix;
 }
 
+const showMetricsMatrix = () => {
+  const metricsMatrix = [];
+  const numOfUsers = recommender.utilityMatrix.length;
+  for (let u = 0; u < numOfUsers; u++) {
+    metricsMatrix.push([]);
+    for (let v = 0; v < numOfUsers; v++) {
+      metricsMatrix[u].push(recommender.sim(u, v));
+    }
+  }
+  const formattedMatrix = Recommender.formatMatrix(metricsMatrix);
+  const opts = {
+    markedCells: 'diagonal',
+    styleClasses: ["text-white", "bg-dark"],
+    rowHeaders: "User",
+    colHeaders: "User"
+  };
 
+  // Shows new calculated matrix
+  showMatrix('metricValues_container', 'headingSix', opts, formattedMatrix);
+  return metricsMatrix;
+}
 
 
 
