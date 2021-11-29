@@ -22,7 +22,7 @@ const metrics = {
 
 const normalizers = {
   pearsonNormalizer: (val) => val/2 + 1/2,
-  cosineNormalizer: (val) => val/2 + 1/2,
+  cosineNormalizer: (val) => val,
   euclideanNormalizer: (val, numbOfItems) => (-val / Math.sqrt((MAX_RATING ** 2) * numbOfItems)) + 1
 }
 
